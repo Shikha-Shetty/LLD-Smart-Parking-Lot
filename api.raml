@@ -1,0 +1,198 @@
+#%RAML 1.0
+title: Smart Parking Lot API
+version: 1.0.0
+
+types:
+  Vehicle:
+    properties:
+      vehicleId: string
+      vehicleSize: string
+
+  ErrorResponse:
+    properties:
+      errorCode: string
+      errorMessage: string
+
+  RecordEntryResponse:
+    properties:
+      message: string
+
+  AllocateSpotResponse:
+    properties:
+      spotId: string
+      message: string
+
+  CalculateFeeRequest:
+    properties:
+      vehicleId: string
+      exitTime: datetime
+
+  CalculateFeeResponse:
+    properties:
+      entryTime: datetime
+      spotId: string
+      message: string
+
+  ConfirmPaymentRequest:
+    properties:
+      vehicleId: string
+
+  ConfirmPaymentResponse:
+    properties:
+      message: string
+
+  FreeSpotRequest:
+    properties:
+      spotId: string
+
+  FreeSpotResponse:
+    properties:
+      message: string
+
+/error:
+  post:
+    description: Handle error responses
+    body:
+      application/json:
+        example: |
+          {
+            "errorCode": "ERR_500",
+            "errorMessage": "Internal server error"
+          }
+
+/recordEntry:
+  post:
+    description: Record vehicle entry into the parking lot
+    body:
+      application/json:
+        type: Vehicle
+    responses:
+      200:
+        body:
+          application/json:
+            type: RecordEntryResponse
+            example: |
+              {
+                "message": "Entry recorded successfully"
+              }
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_400",
+                "errorMessage": "Invalid vehicle details"
+              }
+
+/allocateSpot:
+  post:
+    description: Allocate a parking spot for the vehicle
+    body:
+      application/json:
+        type: Vehicle
+    responses:
+      200:
+        body:
+          application/json:
+            type: AllocateSpotResponse
+            example: |
+              {
+                "spotId": "string",
+                "message": "Spot allocated successfully"
+              }
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_400",
+                "errorMessage": "Invalid vehicle details"
+              }
+      404:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_404",
+                "errorMessage": "No available spots"
+              }
+
+/calculateFee:
+  post:
+    description: Calculate parking fee for the vehicle
+    body:
+      application/json:
+        type: CalculateFeeRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: CalculateFeeResponse
+            example: |
+              {
+                "entryTime": "datetime",
+                "spotId": "string",
+                "message": "Fee calculated successfully"
+              }
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_400",
+                "errorMessage": "Invalid vehicle details or exit time"
+              }
+
+/confirmPayment:
+  post:
+    description: Confirm payment for the parking fee
+    body:
+      application/json:
+        type: ConfirmPaymentRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: ConfirmPaymentResponse
+            example: |
+              {
+                "message": "Payment confirmed, record deleted"
+              }
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_400",
+                "errorMessage": "Payment failed or invalid vehicle ID"
+              }
+
+/freeSpot:
+  post:
+    description: Free up a parking spot
+    body:
+      application/json:
+        type: FreeSpotRequest
+    responses:
+      200:
+        body:
+          application/json:
+            type: FreeSpotResponse
+            example: |
+              {
+                "message": "Spot freed"
+              }
+      400:
+        body:
+          application/json:
+            type: ErrorResponse
+            example: |
+              {
+                "errorCode": "ERR_400",
+                "errorMessage": "Invalid spot ID"
+              }
